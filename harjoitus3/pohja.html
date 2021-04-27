@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://appro.mit.jyu.fi/tiea2120/vt/vt3/data.js"></script>
+<script type="text/javascript" src="vt3.js"></script>
+<link rel="StyleSheet" href="tyylit.css" type="text/css" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<title>Tulospalvelu</title>
+</head>
+<body>
+
+<!-- Tämän tiedoston sisältöä saa muuttaa vapaasti tästä kommentista eteenpäin ! -->
+<h1>Tulospalvelu</h1>
+<!-- Div, joka pitaa sisallaan nyt joukkuelistaukset ja formit. -->
+<div id="lomakeContainer">
+  <!-- joukkuelistaus. Ennen formeja, kuten ohjeessa sanottiin. -->
+  <div id="joukkueetDiv">
+  </div>
+  <!-- Lisääjoukue lomake. -->
+  <div id="kaikkiLomakkeet">
+  <form class="lomake" id="joukkueLomake">
+    <p class="lomakeHeader">Lisää joukkue</p>
+    <fieldset class="lomakeTiedot">
+      <legend >Joukkueen tiedot</legend>
+      <p><label for="joukkueNimi">Nimi</label><input type="text" id="joukkueNimi" name="nimi" size="35" value=""
+      required pattern=".*\S+.*"/></p>
+      <p><label for="luontiaika">Luontiaika</label>
+      <input type="text" id="luontiaika" max="2018-01-01T01:00" placeholder="pp.kk.vvvv --:--"
+      required pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4} [0-9]{2}:[0-9]{2}" name="luontiaika" size="25" value=""/></p>
+      <div id="leimaustapaDiv">
+	<p>Leimaustapa</p>
+	<div id="leimaustavat">
+	  <p><label for="GPS">GPS</label><input type="checkbox" id="GPS" name="GPS"/></p>
+	  <p><label for="NFC">NFC</label><input type="checkbox" id="NFC" name="NFC"/></p>
+	  <p><label for="QR">QR</label><input type="checkbox" id="QR" name="QR"/></p>
+	  <p><label for="leimaustapaLomake">Lomake</label><input type="checkbox" id="leimaustapaLomake" name="leimaustapaLomake"/></p>
+	</div>
+      </div>
+      <div id="sarjaContainer">
+	<p id="sarjaTeksti" >Sarja</p>
+	<div id="sarja">
+	  <!-- Tanne luodaan dynaamisesti radiobuttonit. -->
+	</div>
+      </div>
+    </fieldset>
+    <fieldset class="jasenet">
+      <legend>Jäsenet</legend>
+      <!-- Tanne luodaan dynaamisesti jasen kentat. -->
+    </fieldset>
+    <!-- Alasvetovalikko kisaa varten. -->
+    <fieldset class="alasvetokisa">
+      <legend>Kisa</legend>
+        <p>
+	  <select id="kisaSelect">
+	    <!-- luodaan tanne dynaamisesti sarjat -->
+	  </select>
+	</p>
+    </fieldset>
+    <!-- Rastileimaukset. -->
+    <fieldset id="rastileimaukset">
+      <legend>Rastileimaukset</legend>
+      <table id="rastileimausTable">
+	    <!-- luodaan tanne dynaamisesti rastileimaukset. -->
+      </table>
+    </fieldset>
+    <input type="submit" name="lahetapainike" id="tallennaJoukkueButton" value="Tallenna"/>
+  </form>
+  <!-- Lisääkisa lomake. -->
+  <form id="kisaLomake">
+    <p class="kisalomakeHeader">Lisää kisa</p>
+    <fieldset class="kisalomakeTiedot">
+      <legend >Kisan tiedot</legend>
+      <p><label for="kisaNimi">Nimi</label><input type="text" id="kisaNimi" name="nimi" size="35" value=""
+      required pattern=".*\S+.*"/></p>
+      <p><label for="kesto">Kesto</label><input type="text" id="kesto" name="kesto" size="25" value="" min="1"
+      required pattern="^\s*\d+\s*$"/></p>
+      <p><label for="alkuaika">Alkuaika</label>
+      <input type="text" id="alkuaika" placeholder="pp.kk.vvvv --:--" max="2099-01-01T01:00"
+      required pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4} [0-9]{2}:[0-9]{2}" name="alkuaika" size="25" value=""/></p>
+      <p><label for="loppuaika">Loppuaika</label>
+      <input type="text" id="loppuaika" placeholder="pp.kk.vvvv --:--"
+      required pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4} [0-9]{2}:[0-9]{2}" name="loppuaika" size="25" value=""/></p>
+    </fieldset>
+    <input type="submit" name="lahetakisapainike" id="tallennaKisaButton" value="Tallenna"/>
+    </div>
+
+</div> <!-- lomakeContainer-->
+
+</body>
+</html>

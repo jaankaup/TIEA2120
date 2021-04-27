@@ -1,0 +1,145 @@
+#kokohoska {
+  display: flex;
+  width: 50%;
+}
+
+#lisaaJoukkueForm {
+  display: inline-block;
+  order: 0;
+  width: 30%;
+  border: rgb(214,156,82) 3px solid;
+  margin-right: 1%;
+}
+
+#rastilistausDiv {
+  display: inline-block;
+  order: 1;
+  float: right;
+  width: 30%;
+  border: rgb(214,156,82) 3px solid;
+  margin-right: 1%;
+}
+
+#joukkuelistausDiv {
+  display: inline-block;
+  order: 2;
+  float: right;
+  width: 30%;
+  border: rgb(214,156,82) 3px solid;
+}
+
+#joukkuelistausDiv ul li div p a {
+  margin-right: 0.5em;
+}
+
+#joukkuelistausDiv ul li div p a:hover {
+  font-weight: bold;
+  color: red;
+}
+
+#joukkuelistausDiv ul li div p {
+  margin: 0;
+}
+
+#joukkuelistausDiv ul li div {
+  margin-bottom: 0.5em;
+}
+
+.koodi:hover {
+  font-weight: bold;
+  color: red;
+}
+
+.rastiDiv div label {
+  display: inline-block;
+  margin-right: 0.5em;
+}
+
+.rastiDiv div p {
+  display: inline-block;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-right: 0.5em;
+}
+
+.koodi p input, .koodi p label {
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#lisaaJoukkueP, #joukkueetP, #rastilistausP {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.5em;
+}
+
+#joukkueenTiedotFieldSet {
+  margin: 0.5em;
+}
+
+#joukkueNimi, #luontiaika, #jasenet input {
+  float: right;
+  margin-right: 5em;
+}
+
+
+#sarjatDiv {
+
+}
+
+/****** Leimaustavat ***********/
+
+#leimaustavatDiv { display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+#leimaustapaText {
+  display: table-cell;
+  width: 30%;
+  vertical-align: top;
+}
+
+#leimaustapaBoxit {
+  display: table-cell;
+  width: 70%;
+  float: right;
+  margin-right: 4em;
+}
+
+#leimaustapaBoxit p {
+  margin: 0;
+  display: table-row;
+  clear: right;
+  float: right;
+}
+
+/******* Sarjat *************/
+
+#sarjatDiv { display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+#sarjaText {
+  display: table-cell;
+  width: 30%;
+  vertical-align: top;
+}
+
+#sarjaBoxit {
+  display: table-cell;
+  width: 70%;
+  float: right;
+  margin-right: 4em;
+}
+
+#sarjaBoxit p {
+  margin: 0;
+  display: table-row;
+  clear: right;
+  float: right;
+}
+
+/*******************************/

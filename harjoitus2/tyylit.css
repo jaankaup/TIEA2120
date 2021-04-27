@@ -1,0 +1,81 @@
+#tupa table {
+  width: 100%;
+  border: 1px solid black;
+}
+
+#tupa table tr:nth-child(2n) {
+  background-color: blanchedalmond;
+}
+
+#tupa table caption {
+  text-align: left;
+}
+
+#tupa table tr th {
+  width: 20em;
+  text-align: left;
+  background-color: silver;
+}
+
+#tupa table tr th:nth-child(2) {
+  width: 40em;
+}
+
+#tupa table tr td {
+  width: 20em;
+  text-align: left;
+}
+
+#tupa table tr td:nth-child(2) {
+  width: 40em;
+}
+
+form {
+  width: 35em;
+  background-color: blanchedalmond;
+  /* display: table; */
+}
+
+form fieldset p input {
+  float: right;
+  width: 11em;
+}
+
+#leimausLoota {
+  border: medium solid red;
+  padding: 3.3em;
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+  background-color: white;
+}
+
+#leimausDiv {
+  margin-top: 0.3em;
+  margin-bottom: 0.5em;
+}
+
+#leimausDiv button {
+  float: right;
+}
+
+#leimausAika, #leimausRasti, #leimausPoista, #leimausTallenna  {
+  display: table-cell;
+  padding-left: 0.3em;
+  padding-bottom: 0.3em;
+}
+
+#leimausLoota {
+  margin: 1em;
+  padding: 1em;
+  background-color: orange;
+}
+
+#leimausPoista > input {
+  text-align: left;
+}
+
+.hidden {
+  display: none;
+}
+
+

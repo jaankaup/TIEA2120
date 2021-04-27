@@ -1,0 +1,108 @@
+/* Kaytetaan tallakertaa wv, niin saadaan tyhja div:kin ottamaan tilaa. TODO: muuta prosenteiksi tai jotain muuta vastaavaa jos jaa aikaa. */
+
+body {
+  width: 100%vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  /*overflow: hidden; */
+  /* Muutoin tulee arsyttavia tyhjia #text elementteja inline-block elementtien valiin. */
+  /* Toinen tapa olisi floata ne pois. Tai olla kayttamatta inline-blockia. */
+}
+
+#kokoRoska {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  /*overflow: hidden;*/ 
+}
+
+#kartta {
+/*  display: inline-block; */
+  display: block;
+  order: 0;
+  width: 40%/*vw*/;
+  height: 100%/*vh*/;
+  font-size: 18em;
+}
+
+#kartalla {
+  display: block;
+/*  display: inline-block; */
+  order: 1;
+  width: 30%/*vw*/;
+  height: 100%/*vh*/;
+  color: black;
+  font-size: 2em;
+/*  background-color: red; */
+}
+
+#joukkueet {
+  display: block;
+/*  display: inline-block; */
+  order: 2;
+  width: 30%/*vw*/;
+  height: 100%/*vh*/;
+  font-size: 2em;
+/*  background-color: yellow; */
+  color: black;
+}
+
+#kartallaP {
+  display: block;
+  margin: 0;
+  padding: 0;
+  padding-top: 1%;
+  padding-left: 4%;
+/*  width: 100%;
+  height: 10%; */
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+#joukkueetP {
+  display: block;
+  margin: 0;
+  padding-top: 1%;
+  padding-left: 4%;
+  /*
+  width: 100%;
+  height: 10%;
+  */
+  font-size: 0.8em;
+  font-weight: bold;
+  color: black;
+}
+
+.joukkueLI {
+  font-size: 0.5em;
+  width: 70%;
+}
+
+//.joukkueLI label {
+//  margin: 0;
+//}
+
+.kartallaLI {
+  font-size: 0.5em;
+  width: 70%;
+}
+
+//.kartallaLI label {
+//  margin: 0;
+//}
+
+.summaryP {
+  display: inline-block;
+}
+
+.nimiLabel {
+  display: inline-block;
+  font-size: 0.8em;
+}
+
+.matkaLabel {
+  display: inline-block;
+  padding-left: 0.5em;
+  font-size: 0.8em;
+}

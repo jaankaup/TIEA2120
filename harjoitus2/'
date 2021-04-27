@@ -1,0 +1,901 @@
+// data-muuttuja on sama kuin viikkotehtävässä 1.
+//
+
+"use strict";
+
+window.onload = function() { luoTaulukko(["Sarja","Pisteet"]);/* luoTaulukko(["Sarja","Joukkueet"] taso 1 mukaisesti); */
+                             createLisaaRasti();
+			     createJoukkueForm(createDefaultJoukkue(), "2h", false);
+			   };
+
+console.log(data);
+
+/* Funktio, joka luo joukkueen, jossa ei ole jasenia eika nimea. */
+function createDefaultJoukkue() {
+   return {id:0, jasenet: ["",""], last: "2009-09-09 13:13:13", nimi: ""};
+}
+
+// Apufunktio input-labelin tekoon. Ei tee virhetarkistusta! 
+function createLabel(labelText, inputName, inputId, inputType, inputValue, inputSize) {
+  let p = document.createElement("p");
+  let label = document.createElement("label");
+  label.textContent = labelText;
+  let input = document.createElement("input");
+  input.setAttribute("name",inputName);
+  input.setAttribute("id", inputId);
+  input.setAttribute("type", inputType);
+  input.setAttribute("size", inputSize);
+  input.value = inputValue;
+  label.appendChild(input);
+  p.appendChild(label);
+  return p; 
+}
+
+/* Functio joka luo taulukon rasteista, tuvista ym. Parametrin sortMethod taytyy olla lista merkkijonoja, jotka kertoo sen miten taulukko jarjestetaan. 
+ * sortMethod taytyy koostua ainakin yhdesta seuraavasta stringista: 
+ *
+ *      "Sarja", "Joukkue", "Pisteet", "Matka" ja "Kokonaisaika"
+ *
+ * Tarkempaa tiedoa sortMethodista saat funktiosta getTableData.
+ *
+ * Esim ["Sarja","Joukkue"] jarjestaa taulukon ensin sarjan mukaan, sitten joukkueen mukaan.    
+ */
+function luoTaulukko(sortMethod) {
+
+  // Haetaan elementti nimeltaan tupa.
+  let tupa = document.getElementById("tupa"); 
+
+  // Etsitaan entuudestaan olevaa taulukkoa.
+  let oldTable = document.querySelector("#tupa table");
+  let tableFound = false;
+
+  // Jos taulukkoa ei ole olemassa asetetaan tableFound trueksi. Tarvitaan funktion lopussa. 
+  if (oldTable != null) {
+    tableFound = true;
+    // Poistetaan kaikki lapset taulukosta. 
+    while (oldTable.firstChild) oldTable.removeChild(oldTable.firstChild);
+  }
+  else  {
+    // Luodaan uusi taulukko.
+    oldTable = document.createElement("table");
+  }
+
+  // Asetetaan capture teksti.
+  oldTable.createCaption().textContent = "Tulokset";
+
+  // Luodaan taulukon solujen otsikot.
+  let tr = document.createElement("tr"); 
+
+  // Luodaan Sarjat otsikko.
+  let th_sarjat = document.createElement("th");
+  th_sarjat.textContent = "Sarja";
+  // Rekisteroidaan tapahtuma taulukon "Sarja" kohtaan. Eli jarjestetaan taulukko ensisijaisesti sarjan mukaan, sitten pisteiden mukaan, sitten nimen mukaan.
+  th_sarjat.addEventListener("click", (e) => luoTaulukko(["Sarja", "Pisteet","Joukkue"]), false);
+
+  let th_joukkueet = document.createElement("th");
+  th_joukkueet.textContent = "Joukkueet";
+  // Rekisteroidaan tapahtuma taulukon "Joukkue" kohtaan. Eli jarjestetaan joukkueen nimen mukaan.
+  th_joukkueet.addEventListener("click", (e) => luoTaulukko(["Joukkue"]), false);
+
+  let th_pisteet = document.createElement("th");
+  th_pisteet.textContent = "Pisteet";
+
+  // Rekisteroidaan tapahtuma taulukon "Pisteet" kohtaan. Eli jarjestetaan taulukko ensisijaisesti pisteiden mukaan, sitten joukkueen nimen mukaan.
+  th_pisteet.addEventListener("click", (e) => luoTaulukko(["Pisteet", "Joukkue"]), false);
+
+  let th_matka = document.createElement("th");
+  th_matka.textContent = "Matka";
+  // Rekisteroidaan tapahtuma taulukon "Matka" kohtaan. Eli jarjestetaan taulukko ensisijaisesti matkan mukaan, sitten joukkueen nimen mukaan.
+  th_matka.addEventListener("click", (e) => luoTaulukko(["Matka", "Joukkue"]), false);
+
+  let th_aika = document.createElement("th");
+  th_aika.textContent = "Kokonaisaika";
+  // Rekisteroidaan tapahtuma taulukon "Aika" kohtaan. Eli jarjestetaan taulukko ensisijaisesti ajan mukaan, sitten joukkueen nimen mukaan.
+  th_aika.addEventListener("click", (e) => luoTaulukko(["Kokonaisaika", "Joukkue"]), false);
+
+  tr.appendChild(th_sarjat);
+  tr.appendChild(th_joukkueet);
+  tr.appendChild(th_pisteet);
+  tr.appendChild(th_matka);
+  tr.appendChild(th_aika);
+
+  // Lisataan solujen otsikot taulukkoon.
+  oldTable.appendChild(tr);
+
+  // Haetaan taulukkoa varten data.
+  let taulukkoData = getTableData(sortMethod);
+ 
+  // Kaydaan lapi taulukkoData ja muokataan DOM rakenetta sen mukaan.
+  for (let x of taulukkoData) {
+
+      let tr_taulukko = document.createElement("tr");
+
+      // Sarjan nimi.
+      let td_sarja = document.createElement("td");
+      td_sarja.textContent = x.sarjanNimi;
+
+
+      // Joukkuen nimi ja jasenet.
+      let td_joukkue = document.createElement("td");
+
+      let a = document.createElement("a");
+      a.setAttribute("href", "#joukkue");
+      a.textContent = x.joukkue.nimi;
+      a.addEventListener("click",(e) => { let j = haeJoukkue(e.target.firstChild.nodeValue); 
+                                          //console.log(e.target.parentNode.parentNode.firstChild.firstChild.nodeValue);
+					  //Luodaan uusi joukkueForm joukkueesta seka sarjasta (sarja stringina).
+                                          createJoukkueForm(j,e.target.parentNode.parentNode.firstChild.firstChild.nodeValue,true); 
+					  let jformInput = document.querySelectorAll("#lisaaJoukkueForm input"); 
+					  jformInput[0].value = j.nimi;
+                                          for (let x=1; x<jformInput.length; x++) {
+                                            
+					  }
+                                        });
+      
+      // Selvitetaan joukkueen osallistujien nimet,
+      let nimet = x.joukkue["jasenet"].join(', ');
+
+      td_joukkue.appendChild(a);
+      td_joukkue.appendChild(document.createElement("br"));
+      td_joukkue.appendChild(document.createTextNode(nimet));
+
+      // Joukkueen pisteet.
+      let td_pisteet = document.createElement("td");
+      td_pisteet.textContent = x.pisteet;
+
+      // Joukkueen matka.
+      let td_matka = document.createElement("td");
+      td_matka.textContent = Math.round(x.matka*Math.pow(10,0)/Math.pow(10,0)).toString();
+ 
+      // Joukkueen kokonaisaika.
+      let td_aika = document.createElement("td");
+      td_aika.textContent = aikaToString(x.aika);
+
+      // Muodostetaan rivi ja lisataan taulukkoon.
+      tr_taulukko.appendChild(td_sarja);
+      tr_taulukko.appendChild(td_joukkue);
+      tr_taulukko.appendChild(td_pisteet);
+      tr_taulukko.appendChild(td_matka);
+      tr_taulukko.appendChild(td_aika);
+
+      oldTable.appendChild(tr_taulukko);
+  }
+
+  // Lisataan taulukko tupaan jo sita ei ole entuudestaan. 
+  if (!tableFound) {
+    tupa.appendChild(oldTable);
+  }
+}
+
+/* Funktio, joka hakee ja palauttaa ensimmaisen joukkueen, jonka nimi on @joukkueenNimi. Muussa tapauksessa palauttaa null. */
+function haeJoukkue(joukkueenNimi) {
+  for (let x of data.sarjat) {
+    for (let y of x.joukkueet) {
+      if (y.nimi === joukkueenNimi) {
+        return y;
+      }
+    }
+  }
+  return null;
+}
+
+/* Funktio, joka luo lisaa rasti lomakkeen. */
+function createLisaaRasti() {
+  let lomake = document.querySelector("form");
+  let fieldset = document.createElement("fieldset"); 
+  let legend =  document.createElement("legend");
+
+  legend.textContent = "Rastin tiedot";
+  fieldset.appendChild(legend);
+
+  // Parseri-funktio floateja varten. parseFloat hyvaksyy myos sellaiset merkkijonot, joiden alussa on float ja loppu on jotain muuta.
+  // Nyt hyvaksytaan ainoastaan puhtaat flotarit.
+  const testFloat = function(x) {
+    if (/^(\-|\+)?([0-9]+(\.[0-9]+)?)$/.test(x)) {
+      return Number(x);
+    }
+    return NaN;
+  }
+
+  let button = document.createElement("button");
+
+  // Lisataan painikkeeseen rastinlisays toiminto.
+  button.addEventListener("click", (e) => { e.preventDefault();
+                                            let id = document.querySelector("#rasti_id");
+                                            let kilpailu = document.querySelector("#kilpailu_id");
+                                            let koodi = document.querySelector("#koodi");
+                                            let lat = document.querySelector("#lat");
+                                            let lon = document.querySelector("#lon");
+					    let lat_float = testFloat(lat.value.trim());
+					    let lon_float = testFloat(lon.value.trim());
+					    // Jos koodia ei ole annettu tai jos lat tai lon eivat ole floateja.
+					    if ((koodi.value.trim()).length == 0 || isNaN(lat_float) || isNaN(lon_float)) return;
+					    else {
+					      data["rastit"].push({id: parseInt(id.value), kilpailu: parseInt(kilpailu.value), lon: lon_float, koodi: koodi.value, lat: lat_float});
+					      for (let k of data["rastit"]) {
+                                                console.log(`${k.koodi} : ${k.lat} : ${k.lon}`);
+					      }
+					    }
+                                          });
+  button.textContent = "Tallenna";
+
+
+ 
+  // Luodaan input-labelit.
+  let id_labeli = createLabel("id","rasti_id","rasti_id","number",0,20);
+  let kilpailu_labeli = createLabel("kilpailu","kilpailu_id","kilpailu_id","number",0,20);
+  let koodi_labeli = createLabel("koodi","koodi","koodi","text","0",20);
+  let lat_labeli = createLabel("lat","lat","lat","text",0.0,20);
+  let lon_labeli = createLabel("lon","lon","lon","text",0.0,20);
+
+  fieldset.appendChild(id_labeli);
+  fieldset.appendChild(kilpailu_labeli);
+  fieldset.appendChild(koodi_labeli);
+  fieldset.appendChild(lat_labeli);
+  fieldset.appendChild(lon_labeli);
+
+  lomake.appendChild(fieldset);
+  lomake.appendChild(button);
+
+}
+
+
+/* Apufunktio, joka lisaa eventListenerin inputiin. Paremetrin p taytyy olla muotoa <p><lable><input></input></label></p>. 
+ * Helpompi olisi ollut vain etsia haluttu elementti selectorilla ja sitten lisata kuuntelija, mutta olkoon nyt nain.
+ * Parametri ev on eventin nimi.
+ * Parametri f on eventlisteneriun callbackfunktio funktio.
+ * Palauttaa truen jos onnistuu, muutoin tulostaa consoliin virheen ja palauttaa falsen. */
+function addListenerP(p, ev, f) {
+  
+  if (typeof f !== "function") {
+    console.error("addListener: f ei ole funktio");
+    return false;
+  }
+
+  if (typeof ev !== "string") {
+    console.error("addListener: ev ei ole string");
+    return false;
+  }
+
+  if (typeof p !== "object") {
+    console.error("addListener: p ei ole object");
+    return false;
+  }
+
+  // Haetaan input.
+  var input = p.firstChild.childNodes[1];
+  if (input === undefined) {
+    console.error("addListener: input === undefined.");
+    return false;
+  }
+  input.addEventListener(ev,f);
+  return true;
+}
+
+/* Funktio, joka luo joukkueen muokkausta varten buttonin. @joukkue on joukkue olio. @sarjaStr on sarjan nimi stringina. 
+ * @buttonText on nappulassa lukeva teksti. */
+function createLuoJoukkueButton(joukkue, sarjaStr, buttonText) {
+
+  let button = document.createElement("button");
+
+  // Arvo joka kertoo sen, onko nappula disabloitu vai ei.
+  let disabled = true;
+
+  // Disabloidaan nappula.
+  button.setAttribute("disabled","true");
+
+  button.textContent = buttonText;
+  button.setAttribute("name", "joukkue");
+  button.addEventListener("click", (e) => { e.preventDefault();
+                                            lisaaJoukkue(joukkue,sarjaStr);
+					    luoTaulukko(["Sarja","Pisteet"]);
+					    // Avataan Joukue form uuden joukkueen lisays tilaan.
+					    createJoukkueForm(createDefaultJoukkue(), "2h", false);
+					  });
+  return button;
+}
+
+/* Funktio, joka luo buttonin, jota painettaessa joukkue-form menee joukkueen lisaystilaan. */
+function createUusiJoukkueButton() {
+  
+  let button = document.createElement("button");
+  button.disabled = false;
+
+  button.textContent = "Luo uusi joukkue";
+  //button.setAttribute("name", "joukkue");
+  button.addEventListener("click", (e) => { e.preventDefault();
+                                            //lisaaJoukkue(joukkue,sarjaStr);
+					    //luoTaulukko(["Sarja","Pisteet"]);
+					    // Avataan Joukue form uuden joukkueen lisays tilaan.
+					    createJoukkueForm(createDefaultJoukkue(), "2h", false);
+					  });
+  return button;
+}
+
+/* Funktio, joka luo joukkueiden lisaamista ja muokkausta varten lomakkeen. @joukkue on joukkueolio ja @sarjaStr on sarja stringina.
+ * @booleanMuokkaa kertoo sen muokataankko joukkuetta. Lisaksi luodaan alasvetolista joukkueen rastileimauksille, eli tuville.*/
+function createJoukkueForm(joukkue,sarjaStr,booleanMuokkaa) {
+
+  if (joukkue === undefined || joukkue === null) {
+    console.error("createJoukkueForm: joukkue = " + joukkue);
+    return;
+  }
+  if (typeof sarjaStr !== "string") {
+    console.error("createJoukkueForm: typeof sarjaStr === " + typeof sarjaStr + ". Taytyy olla string.");
+  }
+
+  // Jos joukkueesa ei ole tarpeeksi jasenia, niin luodaan tassa lisaa tyhjia jasenia kunnes jasenia on tarpeeksi. Muuten tulee ongelmia esim. Vara 1 joukkueen kohdalla.
+  // Viisampaa olisi olla muuttamatta mitaan, mutta olkoon nyt talla tavalla talla kertaa. Mennaan purkka/liima meiningilla nyt taman yhden kerran.
+  if (joukkue.jasenet.length < 2) {
+    while (joukkue.jasenet.length < 2) {
+      joukkue.jasenet.push("");
+    }
+  }
+
+  // Haetaan Uusi joukkue lomake.
+  let lomake = document.querySelectorAll("body form")[1];
+
+  /* Tyhjennetaan taulukon edelliset elementit. */
+  if (lomake !== null) {
+    while (lomake.firstChild) lomake.removeChild(lomake.firstChild);
+  }
+
+  // Lisataan lomakkeelle id. Helpottaa jatkossa.
+  lomake.setAttribute("id","lisaaJoukkueForm");
+
+  // Luodaan fieldsetit.
+  let fieldset = document.createElement("fieldset"); 
+  let fieldset_sisempi = document.createElement("fieldset"); 
+  let legend =  document.createElement("legend");
+  let pButton = document.createElement("p");
+
+  // Jos ollaan muokkaamassa jo olemassa olevaa joukkuetta, niin luodaan Tallenna muutokset nappi seka nappi, jolla saadaan 
+  // formi uuden joukkueen lisays tilaan.
+  if (booleanMuokkaa === true) { 
+    pButton.appendChild(createLuoJoukkueButton(joukkue,sarjaStr,"Tallenna muutokset"));
+    pButton.appendChild(createLuoJoukkueButton(joukkue,sarjaStr,createUusiJoukkueButton()));
+  }
+  // Muussa tapauksessa luodaan Luo uusi joukkue nappi.
+  else pButton.appendChild(createLuoJoukkueButton(joukkue,sarjaStr,"Luo uusi joukkue"));
+
+
+  let nimi_label = createLabel("Nimi ", "", "", "text","",20);
+
+  // Lisataan nimi_labeliin buttonin tarkistus kuuntelija.
+  addListenerP(nimi_label, "input", (e) => checkJoukkueForm());
+
+  if (booleanMuokkaa === false) legend.textContent = "Uusi joukkue";
+  else legend.textContent = "Muokkaa joukkuetta";
+  fieldset.appendChild(legend);
+  fieldset.appendChild(nimi_label);
+  fieldset.appendChild(fieldset_sisempi);
+
+  // Sisemman fieldsetin sisalto.
+  let legend_sisempi = document.createElement("legend");
+  legend_sisempi.textContent = "Jäsenet"; 
+  fieldset_sisempi.appendChild(legend_sisempi);
+
+  // Jos kahden ensimmaisen joukkueen jasenen nimi on jotain epatyhjaa, niin lisataan yksi ylimaarainen tyhja input. Talloin on kivempi muokata html-sivulla inputteja.
+  if (joukkue.jasenet[0].trim().length !== 0 && joukkue.jasenet[1].trim().length !== 0) {
+    joukkue.jasenet.push("");
+  }
+
+  /* Luodaan jasen-inputit. */
+  for (let x=0 ; x<joukkue.jasenet.length ; x++) {
+    let jasenLabel = createLabel("Jäsen " + (x+1), "", "", "text", joukkue.jasenet[x], 20);
+    addListenerP(jasenLabel, "input",(e) => checkJoukkueForm()); 
+    fieldset_sisempi.appendChild(jasenLabel);
+  }
+
+  lomake.appendChild(fieldset);
+
+  // Asetetaan nappula paikoilleen.
+  fieldset.appendChild(pButton);
+
+  // jos ollaan muokkaamassa joukkuetta, niin taytyy olla myos sellainen nappula, josta voi luoda uuden joukkueen.
+//  if (booleanMuokkaa === true) {
+//    fieldset.appendChild(document.createElement("p").appendChild(createUusiJoukkueButton()));
+//  }
+
+  // Tarkistetaan joukkueen lisays inputit.
+  checkJoukkueForm();
+
+  // Luodaan alasvetovalikko.
+  createAlasVetoValikko(joukkue,lomake);
+}
+
+/* Luo joukkueelle alasvetovalikon rastileimauksia varten. @joukkue on kasiteltavan joukkueen joukkue-olio. */
+function createAlasVetoValikko(joukkue) {
+  let lomake = document.getElementById("lisaaJoukkueForm");
+  let secondFieldset = document.createElement("fieldset");
+  let secondLegend = document.createElement("legend");
+  secondLegend.textContent = "Rastileimaukset";
+  secondFieldset.setAttribute("id","rastileimaukset");
+  secondFieldset.appendChild(secondLegend);
+  
+  let leimaukset = haeTuvatByJoukkue(joukkue); 
+
+  let select = document.createElement("select");
+  select.setAttribute("id","rastiLeimat");
+  select.addEventListener('change', e => { for (let i of e.target) if (i.selected === true) createRastiLeimausForm(joukkue,leimaukset[parseInt(i.value)]); });
+
+  // Asetetaan rastileimaukset formiin.
+  secondFieldset.appendChild(select);
+  lomake.appendChild(secondFieldset);
+
+  // Luodaan alasvetolistan sisalto.
+  for (let x=0; x<leimaukset.length; x++) {
+
+    let opt = document.createElement("option"); 
+    // padit eivat toimi tassa.
+    let aika = ("aika: " + leimaukset[x].aika).padEnd(27);
+    let rasti = ("rasti: " + leimaukset[x].rasti.toString()).padEnd(25);
+    let joukkue = ("joukkue: " + leimaukset[x].joukkue.toString()).padEnd(27);
+    let text = aika + rasti + joukkue;
+    let a = document.createTextNode(aika);
+    let r = document.createTextNode(rasti);
+    let j = document.createTextNode(joukkue);
+    opt.appendChild(a);
+    opt.appendChild(r);
+    opt.appendChild(j);
+    console.log(aika + rasti + joukkue);
+    opt.setAttribute("value",x);
+    select.appendChild(opt);
+    if (x === 0) { 
+      createRastiLeimausForm(joukkue,leimaukset[0]);
+    }
+  }
+}
+
+/* Tarvitaanko joukkuetta? Luo rastileimausta varten tarvittavat labelit. */
+function createRastiLeimausForm(joukkue, rasti) {
+  console.log(rasti);
+
+  let leimauksetFieldset = document.getElementById("rastileimaukset");
+
+  // Poistetaan vanhat inputit jos niita loytyy.
+  let inputLabels = document.querySelectorAll("#rastileimaukset p");
+  for (let child of inputLabels) {
+    leimauksetFieldset.removeChild(child);
+  }
+
+  // Poistetaan vanhat nappulat.
+  let buttons = document.querySelectorAll("#rastileimaukset button");
+  for (let child of buttons) {
+    leimauksetFieldset.removeChild(child);
+  }
+  // console.log(inputLabels);
+
+  // Luodaan inputit ja nappulat.
+  let inputAika = createLabel("Aika (yyyy-mm-dd hh:mm:ss)", "", "", "text", rasti.aika, 20);
+  let inputRasti = createLabel("Rasti", "", "", "text", rasti.rasti, 20);
+  let buttonUusi = document.createElement("button");
+  let buttonTallenna = document.createElement("button");
+  let buttonPoista = document.createElement("button");
+
+  // Nappuloiden configurointi.
+  buttonUusi.textContent = "Luo uusi rasti";
+  buttonTallenna.textContent = "Tallenna";
+  buttonTallenna.setAttribute("disabled","true");
+  buttonPoista.textContent = "Poista";
+  buttonPoista.setAttribute("disabled","true");
+
+  buttonUusi.addEventListener("click", e => { e.preventDefault(); });
+  buttonTallenna.addEventListener("click", e => { e.preventDefault(); });
+  buttonPoista.addEventListener("click", e => { e.preventDefault(); });
+
+  leimauksetFieldset.appendChild(inputAika);
+  leimauksetFieldset.appendChild(inputRasti);
+  leimauksetFieldset.appendChild(buttonUusi);
+  leimauksetFieldset.appendChild(buttonTallenna);
+  leimauksetFieldset.appendChild(buttonPoista);
+}
+
+/* Funktio joka lisaa annetun @joukkue dataan. @sarjanNimi on sarjan nimi merkkijonona, johon joukkue halutaan lisata.
+ * Jos sarjaa ei loydy, niin tulostaa virheen konsoliin ja lopettaa.
+ * Muussa tapauksessa lisataan 
+ */
+function lisaaJoukkueDataan(joukkue, sarjanNimi, jasentenNimet, joukkueenNimi) {
+
+  // Etsitaan sarja.
+  let sarja = undefined;
+  for (let s of data.sarjat) {
+    if (s.nimi === sarjanNimi) {
+      sarja = s;
+      break;
+    }
+  }
+  if (sarja === undefined) {
+    console.error(`lisaaJoukkue: sarjaa ${sarjanNimi} ei loydy datasta.`);
+    return;
+  }
+
+  // Etsitaan onko joukkue jo entuudestaan datassa.
+  let loydettyJoukkue = undefined;
+  for (let j of sarja.joukkueet) {
+    if (j === joukkue) {
+      loydettyJoukkue = j;
+      break;
+    }
+  }
+
+  // Joukkuetta ei loydy entuudestaan, joten ĺisataan se sarjaan.
+  if (loydettyJoukkue === undefined) {
+    // Lisataan joukkueeseen parametrina tuodut jasenten nimet.
+    joukkue.jasenet = jasentenNimet;
+    // Lisataan joukkueen nimeksi parametrina tuotu joukkueen nimi.
+    joukkue.nimi = joukkueenNimi;
+    sarja.joukkueet.push(joukkue);
+  }
+  // Muussa tapauksessa korvataan vanhan joukkueen jasenet uusilla.
+  else {
+    loydettyJoukkue.jasenet = jasentenNimet;
+    loydettyJoukkue.nimi = joukkueenNimi;
+  }
+}
+
+/* Funktio joka lisaa joukkueen dataan. Nyt luotetaan siihen, etta nappula on enabloitu eli lisays on oikeutettu. */
+function lisaaJoukkue(joukkue, sarja) {
+  var alkuperainenNimi = joukkue.nimi;
+  var inputit = document.querySelectorAll("#lisaaJoukkueForm fieldset:first-child input");
+  let jasenet = [];
+
+  // Haetaan inputeista jasenten nimet.
+  for (let x=1; x<inputit.length; x++) {
+    if (inputit[x].value.trim().length !== 0) {
+      jasenet.push(inputit[x].value);
+    }
+  }
+  lisaaJoukkueDataan(joukkue, sarja, jasenet, inputit[0].value.trim());
+  //lisaaJoukkueDataan({id: joukkue.id, jasenet: jasenet, last: joukkue.last, nimi: inputit[0].value}, sarja, alkuperainenNimi);
+}
+
+/* Funktio, joka tarkastaa onko joukkue-formin tiedot ovat riittavat. Eli joukkueen nimi ja vahintaan kaksi jasenta on olemassa.
+ * Funktio disabloi tai enabloi lisaa painikkeen sen mukaan, onko ylla olevat ehdot voimassa.
+ * Funktio palauttaa truen, jos kaikkiin input-kenttiin on syotetty jotain, muutoin palauttaa false. Tama ominaisuus lienee turha. TODO: muuta.
+ * */
+
+function checkJoukkueForm() {
+
+  // Haetaan joukkue-lomakkeen inputit.
+  let joukkueInputit = document.querySelectorAll("#lisaaJoukkueForm input");
+
+  let jasenet = [];
+
+  // Lisataan jasen-inputit listaan.
+  for (let x=1; x<joukkueInputit.length; x++) {
+    jasenet.push(joukkueInputit[x]);
+  }
+
+  // Haetaan jasentenlisays button.
+  let button = document.querySelector("#lisaaJoukkueForm button");
+
+  if (button == null) {
+    console.error("checkJoukkueForm: button == null.");
+    return false;
+  }
+  
+  if (joukkueInputit == null) {
+    console.error("checkJoukkueForm: joukkueInputit == null.");
+    return false;
+  }
+
+  if (jasenet == []) {
+    console.error("checkJoukkueForm: jasenet == [].");
+    return false;
+  }
+  
+  if (jasenet.length < 2) {
+    console.error("checkJoukkueForm: jasenet.length < 2.");
+    return false;
+  }
+
+  // Tehdaan nappulan validointi. Jos joukkueen nimi tai kaksi ensimmaista jasenta ovat tyhjia merkkijonoja, niin disabloidaan nappula.
+  if (joukkueInputit[0].value.trim().length == 0 || jasenet[0].value.trim().length == 0 || jasenet[1].value.trim().length == 0) {
+    button.disabled = true;
+  }
+  // Muussa tapauksessa enabloidaan nappula.
+  else {
+    button.disabled = false;
+  }
+
+  var lisataankoInput = true;
+  var inputLkm = 0;
+
+  for (let x of joukkueInputit) {
+    if (x.value.trim().length === 0) lisataankoInput = false; 
+    inputLkm = inputLkm + 1;
+  }
+
+  if (lisataankoInput === true) {
+    let joukkueJasenetFieldset = document.querySelector("#lisaaJoukkueForm fieldset fieldset");
+    let uusiInput = createLabel("Jäsen " + inputLkm, "", "", "text", "", 20);
+    addListenerP(uusiInput, "input",(e) => checkJoukkueForm()); 
+    joukkueJasenetFieldset.appendChild(uusiInput);
+  }
+  return true;
+}
+
+/********** Demon 1 funktioita ym lisattyja juttuja. *******/
+
+/* Funktio, joka palauttaa merkkijonosta parsitun Date-olion. Jos parsinta epaonnistuu, niin funktio palauttaa null.
+ * Merkkijonon taytyy olla muotoa dddd-dd-dd dd:dd:dd. */
+function parsiAika(aikaStr)
+{
+  const pattern = /(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/;
+  let [_, v, k, p, h,m,s] = pattern.exec(aikaStr) || []; 
+  let date = new Date(`${v}-${k}-${p}T${h}:${m}:${s}+0000`);
+  /* Testataan onko parsittu aika jarkeva. Jos ei ole, niin palautetaan null. */
+  if (isNaN(date.getTime()))
+  {
+    return null;
+  }
+  // Hmmm. Mikatan tama teki. TODO: Tarkista onko tarpeellinen.
+  let userTimezoneOffset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() + userTimezoneOffset);
+}
+
+/* Funktio, joka palauttaa listan kaikista mallidatan joukkueista. */
+function getJoukkueet(malliData)
+{
+  let joukkueet = []; 
+  for (let sarja of malliData["sarjat"])
+  {
+    for (let joukkue of sarja["joukkueet"])
+    {
+      joukkueet.push(joukkue);
+    }
+  }
+  return joukkueet;
+}
+
+/* Funktio, joka palauttaa mallidatan rastit datan siten, etta kuhunkin objektiin on lisatty property piste, joka on tehtavanannon mukaan
+ * laskettu piste koodista (ensimmainen koodin numero muuttuu pisteeksi, kaikki muut koodit 0:ksi.). Lisaksi lon ja lat muutetaan floatiksi tai NaN jos 
+ * konvertointi epaonnistuu. id on muutettu stringiksi.*/
+function getRastitData(malliData)
+{
+  return malliData["rastit"].map(x => { let k=0; if (x["koodi"].match(/^\d/)) k = parseInt(x["koodi"][0],10);
+                                        return {kilpailu: x.kilpailu, 
+       	 			                lon: parseFloat(x.lon),
+       	 				        koodi: x.koodi,
+       	 				        lat: parseFloat(x.lat),
+       	 				        id: x["id"].toString(),
+       	 				        piste: k};
+                		       });
+}
+
+/* Funktio joka ottaa malliDatasta tupadatan ja konvertoi sen siten, etta aika on joko Date tai null, rasti on konvertoitu stringiksi ja joukkue pysyy sellaisenaan */
+function getTupaData(malliData)
+{
+   return malliData["tupa"].map(x => { return {aika: x.aika, aika_date: parsiAika(x.aika), rasti: x["rasti"].toString(), joukkue: x.joukkue}; }); 
+}
+
+/* Funktio, joka ottaa argumenttina joukkueen ja getTupaDatan mukaisen tuparakenteen. Funktio etsii joukkuetta vastaavat 
+ * tuvat. */
+function etsiTuvat(joukkue, uusiTupaData)
+{
+  /* Etsitaan ne tuvat, jotka matsaavat joukkueen id:n kanssa. */
+  return uusiTupaData.filter(x => x["joukkue"] === joukkue.id);
+}
+
+/* Laskee argumenttina annetun joukkueen pisteet ja palauttaa sen paluuarvona. */
+function laskePisteet(joukkue, uusiTupaData, uusiRastiData)
+{
+  /* Haetaan joukkuetta vastaavat tuvat. */
+  let joukkueenTuvat = etsiTuvat(joukkue, uusiTupaData);
+  /* otetaan joukkueen rastit talteen ja poistetaan monikerrat. */
+  let rastienIdt = new Set(joukkueenTuvat.map(x => x.rasti));
+
+  let pointsit = 0;
+  for (let r of rastienIdt)
+  {
+    for (let rasti of uusiRastiData)
+    {
+      if (rasti.id === r)
+      {
+        pointsit += rasti.piste;
+	break;
+      }
+    }
+  }
+  return pointsit;
+}
+
+/* Demo2 taso5 apufunktio. Haetaan joukkueen kaikki rastileimaukset, eli tuvat. */
+function haeTuvatByJoukkue(joukkue) {
+  return data.tupa.filter(x => joukkue.id === x.joukkue); 
+}
+
+/* Funktio, joka laskee argumenttina annetun joukkueen ajan, matkan ja pisteet. Palauttaa olion {joukkue: joukkue, aika: number, matka: number, pisteet: number} */
+function laske_matka_aika_pisteet(joukkue, uusiTupaData, uusiRastiData)
+{
+  /* Tahan tulee joukkueiden tuvat, josta on poistettu kaikki monikerrat. */
+  let tuvat_no_monikerta = [];
+  /* Haetaan joukkuetta vastaavat tuvat ja poistetaan sellaiset tuvat, jossa ei ole kunnollista aikaa. */
+  let joukkueenTuvat = (etsiTuvat(joukkue, uusiTupaData)).filter(x => x.aika_date !== null);
+  /* otetaan joukkueen rastit talteen ja poistetaan monikerrat. */
+  let rastienIdt = Array.from(new Set(joukkueenTuvat.map(x => x.rasti)));
+  /* Kaydaan kunkin joukkueen tupaData lapi siten, etta otetaan talteen aina ensimmainen rastin id sisaltama tupa talteen ja unohdetaan sita seuraavat vastaavat tuvat. */ 
+  for (let x of rastienIdt)
+  {
+    tuvat_no_monikerta.push(joukkueenTuvat.find(y => y.rasti === x));  
+  }
+  /* Jarjestetaan tuvat viela varmuuden vuoksi ajan mukaan. */
+  tuvat_no_monikerta.sort((x,y) => (x.aika_date).getTime() - (y.aika_date).getTime());
+  let kokonaisAika = undefined;
+  /* Lasketaan kokonaisaika viimeisimman ja ensimmaisen ajan erotuksena. */
+  if (tuvat_no_monikerta.length > 1) 
+  {
+    kokonaisAika = tuvat_no_monikerta[tuvat_no_monikerta.length-1].aika_date -  tuvat_no_monikerta[0].aika_date;
+  }
+  
+  /* Jos ei pystyta maarittamaan kokonaisaikaa, niin asetetaan kokonaisajaksi 0. */
+  if (kokonaisAika === undefined) {
+    kokonaisAika = 0;
+  }
+
+  /* Lasketaan matka. */
+
+  /* Poistetaan rasteista sellaiset rastit, joilla ei ole koordinaatteja. Taman olisi voinnut tehda kerralla jossakin muualla, mutta olkoon nyt tassa. */
+  let rastit_with_koordinates = uusiRastiData.filter(x => x.lat !== NaN && x.lon !== NaN);
+  let matka = 0.0;
+  let edellinenRasti = undefined; 
+  /* Kaydaan lapi kukin joukkueen tupa, ja lasketaan aina edellisen tuvan rastin ja seuraavan rastin koordinaattien etaisyydet yhteen. */
+  for (let t of tuvat_no_monikerta)
+  {
+    let rasti_now = rastit_with_koordinates.find(x => x.id === t.rasti);
+    /* Jos rastia ei loydy id:n perusteella, niin skipataan se. */
+    if (rasti_now === undefined) continue;
+    if (edellinenRasti === undefined) { edellinenRasti = rasti_now; }  
+    matka = matka + getDistanceFromLatLonInKm(edellinenRasti.lat,edellinenRasti.lon,rasti_now.lat,rasti_now.lon);
+    edellinenRasti = rasti_now;
+  }
+  /* Palautetaan data. */
+  return {joukkue: joukkue, matka: matka, aika: kokonaisAika, pisteet: laskePisteet(joukkue, uusiTupaData, uusiRastiData)};
+}
+
+/* Funktio, palauttaa ajan merkkijonona "dd:dd:dd"t tai "00:00:00", jos ei saada parsittua mitaan kunnollista. Funktio ei varmista onko date todellakin aika. */
+function aikaToString(date)
+{
+  if (date === undefined) return "00:00:00";
+  const p = /\d\d:\d\d:\d\d/;
+  /* Kaytetaan toUTCString, silla perinteinen toString tekee kaikkea kikkailuja kuten lisaa 2 tuntia, koska aikavyohykkeemme on GTM+2. */
+  let pDate = p.exec((new Date(date)).toUTCString());
+  return pDate[0];
+}
+
+/* Funktio, joka tulostaa harjoituksen 1 tason 5 mukaisen tulostuksen. */
+function tehtava5(malliData)
+{
+  /* Haetaan kaikki malliDatan joukkueet. */
+  let joukkueet = getJoukkueet(malliData); 
+  /* Haetaan rastidata muunnoksineen. */
+  let rastiData = getRastitData(malliData);
+  /* Haetaan tupadata muunnoksineen. */
+  let tupaData  = getTupaData(malliData);
+  /* Tahan tulee joukkueet data, joka sisaltaa joukkueen, matkan, keston ja pisteet. */
+  let teht5JoukkueData = [];
+
+  /* Kaydaan kaikki joukkueet lapi ja kerataan haluttu data talteen. */
+  for (let x of joukkueet)
+  {
+    teht5JoukkueData.push(laske_matka_aika_pisteet(x, tupaData, rastiData)); 
+  }
+
+  /* Jarjestetaan joukkueet tulostusta varten. Tata ei ole testattu tilanteessa, etta pisteet ovat samat. */
+  teht5JoukkueData.sort((x,y) => {if (y.pisteet - x.pisteet == 0) { return y.aika - x.aika;} else return y.pisteet - x.pisteet;});
+  
+  /* Apufunktio paddingia varten, kun tulostetaan tulosta. */
+  let pad = (x, num) => x.padEnd(num, " ");
+  
+  /* Tulostetaan demo1:sen taso-5 tehtava. */
+  for (let x of teht5JoukkueData)
+  {
+    let madka = Math.round(x.matka*Math.pow(10,0)/Math.pow(10,0)).toString();
+    console.log(pad(x["joukkue"].nimi+ ", ",22) + pad(x.pisteet+ " p, ",8) + pad(madka + " km, ",8) +  pad(aikaToString(x.aika),8));
+  }
+}
+
+function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1); 
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+          Math.sin(dLon/2) * Math.sin(dLon/2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; // Distance in km
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
+// Funktio, joka palauttaa demo2:sen taulukkoa varten dataa. Ottaa parametrina sortMethodin, joka on lista stringeista [str1, ...].
+// Tulokset lajitellaan argumenttina annetun listan mukaan. Tuettuja lajitteluperusteita on 
+//
+// "Sarja", "Joukkue", "Pisteet", "Matka" ja "Kokonaisaika"
+//
+// Tulos lajitellaan ensisijaisesti str1 mukaan, sitten str2 mukaan jne. 
+//
+// Esim getTableData(["Sarja","Joukkue"]) antaa datan siten, etta tulos on lajiteltu ensin sarjan mukaan, sitten joukkueen mukaan.
+//
+// Virheen tapahtuessa funktio kirjaa lokia konsoliin.
+//
+function getTableData(sortMethod) {
+
+  // Kerataan tahan kunkin rivin tiedot {sarja:string, joukkue:joukkue, pisteet:number, matka:number, aika:number} 
+  let tableData = [];
+
+  for (let sarja of data["sarjat"]) {
+
+    for (let joukkue of sarja.joukkueet) {
+      /* Haetaan rastidata muunnoksineen. Tarvitaan kun laskestaan pisteet, matka ja aika. */
+      let rastiData = getRastitData(data);
+      /* Haetaan tupadata muunnoksineen. Tarvitaan kun laskestaan pisteet, matka ja aika.*/
+      let tupaData  = getTupaData(data);
+
+      let joukkueData = laske_matka_aika_pisteet(joukkue, tupaData, rastiData); 
+      tableData.push({sarjanNimi: sarja.nimi, joukkue:joukkue, pisteet: joukkueData.pisteet, matka: joukkueData.matka, aika: joukkueData.aika}); 
+    }
+  }
+
+  // Lajitteluperusteet.
+  const sortMethods = ["Sarja", "Joukkue", "Pisteet", "Matka", "Kokonaisaika"];
+
+  // Lajitellaan data.
+  if (!Array.isArray(sortMethod)) {
+    console.error("getTableData: parametrina tuotu sortMethod ei ole lista.");
+  }
+  
+  // Tarkastetaan sisaltaako parametrina tuotu sortMethod vain stringeja.
+  if (!sortMethod.every(x => typeof x === "string")) {
+    console.error("getTableData: parametrina tuotu sortMethod lista pitaa sisallaan muita kuin stringeja. sortMethod = " + sortMethod);
+  }
+
+  // Tarkastetaan sisaltaako parametrina tuotu sortMethod oikeanmuotoisia stringeja.
+  if (!sortMethod.every(x => sortMethods.includes(x))) {
+    console.error("getTableData: parametrina tuotu sortMethod lista pitaa sisallaan laittomia stringeja. sortMethod = " + sortMethod);
+  }
+  
+  const sortBySarja = function(a,b) {
+                        let nameA = a.sarjanNimi.toUpperCase();
+                        let nameB = b.sarjanNimi.toUpperCase();
+		        if (nameA < nameB) return -1;
+		        else if (nameA > nameB) return 1;
+		        else return 0;
+                      };
+
+  const sortByJoukkue = function(a,b) {
+                          let nameA = a.joukkue.nimi.toUpperCase();
+                          let nameB = b.joukkue.nimi.toUpperCase();
+		          if (nameA < nameB) return -1;
+		          else if (nameA > nameB) return 1;
+		          else return 0;
+                        };
+
+  while (sortMethod.length > 0) {
+    let x = sortMethod.pop();
+    switch (x) {
+      case "Sarja":
+        tableData = tableData.sort(sortBySarja); 
+        break;
+      case "Joukkue":
+        tableData = tableData.sort(sortByJoukkue); 
+        break;
+      case "Pisteet":
+        tableData = tableData.sort((x,y) => y.pisteet - x.pisteet);
+        break;
+      case "Matka":
+        tableData = tableData.sort((x,y) => y.matka - x.matka);
+        break;
+      case "Kokonaisaika":
+        tableData = tableData.sort((x,y) => y.aika - x.aika);
+        break;
+    }
+  }
+
+  return tableData;
+}
+

@@ -1,0 +1,27 @@
+
+/* Funktio, joka testaa onko @obj null tai obj. Heittaa poikkeuksen, jos obj on undefined tai null. */
+function testUN(obj) 
+
+/* Funktio, joka tuhoaa @htmlElement lapset. */
+function clearChildrens(htmlelement)
+
+/* Luo <p><label><input></input></lable></p> muokaisen elementin.
+ * @labelText on labelin teksti.
+ * @iName on inputin name-attribuutti.
+ * @iId on inputin id-attibuutti.
+ * @iType on inputin type-attibuutti.
+ * @iSize on inputin size-attribuutti.
+ * */
+function createVt2Input(labelText, iName, iId, iType, iValue, iSize)
+
+/* Funktio, joka luo sellaisen id:n, jota ei viela ole kaytossa kenellakaan joukkueella. */
+function createJoukkueId() {
+
+/* Funktio, joka luo uuden taulukon, missa nakyy joukkueiden nimet, sarjat, pisteet ym. */
+function createTupaTable()
+
+/* Funktio, joka jarjestaa taulukon alkiot. */
+function sortTable()
+
+/* Luo headerit tupaTablelle. */
+function addHeadersToTable() {

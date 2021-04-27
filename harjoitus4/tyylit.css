@@ -1,0 +1,270 @@
+body {
+  background-color: black;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+image {
+  margin:0;
+  padding:0;
+}
+
+/*****************************************************************************************************/
+/* Palkit.                                                                                           *         
+/*****************************************************************************************************/
+
+.imgPalkki {
+  width: 100%;
+  height: 100%;
+}
+
+.pPalkki {
+  display: inline-block;
+  width: 10%;
+  height: 100%;
+  /* margin-left:2%; */
+  margin-top:0;
+  margin-bottom:0;
+  position: relative;
+  margin-left: -10%;
+  animation: 5s infinite alternate moveEessunTaas; 
+}
+
+@keyframes moveEessunTaas {
+
+  from {
+     left: 0%; 
+  }
+  
+  to {
+    left: 150%; 
+  }
+}
+
+/*****************************************************************************************************/
+/* Pollo.                                                                                           *         
+/*****************************************************************************************************/
+
+.imgPollo {
+  width: 100%;
+}
+
+.pPolloOriginal {
+  display: inline-block;
+  width: 5%;
+  height: 5%;
+  margin:0;
+  position: absolute;
+  animation: 5s infinite normal pollonLiike linear; 
+}
+
+@keyframes pollonLiike {
+
+  from {
+    left: 0%; 
+    top: 0%; 
+  }
+
+  25% {
+    left: 95%; 
+    top: 90%; 
+  }
+
+  50% {
+    left: 0%; 
+    top: 90%; 
+  }
+
+  75% {
+    left: 95%; 
+    top: 0%; 
+  }
+
+  to {
+    left: 0%; 
+    top: 0%; 
+  }
+}
+
+.pPolloOikea {
+  display: inline-block;
+  width: 5%;
+  height: 100%;
+  margin:0;
+  position: absolute;
+  animation: 5s infinite normal pollonLiikeOikea linear; 
+}
+
+@keyframes pollonLiikeOikea {
+
+  from {
+    left: 95%; 
+    top: 0%; 
+  }
+
+  25% {
+    left: 0%; 
+    top: 0%; 
+  }
+
+  50% {
+    left: 95%; 
+    top: 90%; 
+  }
+
+  75% {
+    left: 0%; 
+    top: 90%; 
+  }
+
+  to {
+    left: 95%; 
+    top: 0%; 
+  }
+}
+
+.pPolloVasen {
+  display: inline-block;
+  width: 5%;
+  height: 100%;
+  margin:0;
+  position: absolute;
+  animation: 5s infinite normal pollonLiikeVasen linear; 
+}
+
+@keyframes pollonLiikeVasen {
+
+  from {
+    left: 0%; 
+    top: 0%; 
+  }
+
+  25% {
+    left: 95%; 
+    top: 0%; 
+  }
+
+  50% {
+    left: 0%; 
+    top: 90%; 
+  }
+
+  75% {
+    left: 95%; 
+    top: 90%; 
+  }
+
+  to {
+    left: 0%; 
+    top: 0%; 
+  }
+}
+
+/*****************************************************************************************************/
+/* Pupu.                                                                                           *         
+/*****************************************************************************************************/
+
+.imgPupu {
+}
+
+.canvasPupuVasen, .canvasPupuOikea {
+  display: inline-block;
+  width: 10%; 
+  height: 100%; 
+  margin:0;
+  padding:0;
+  position: absolute;
+  right: 50%;
+  top: 0;
+  animation: 5s infinite alternate pupuAnimation1; 
+}
+
+.canvasPupuOikea {
+  left: 50%;
+  animation: 5s infinite alternate pupuAnimation2; 
+}
+
+@keyframes pupuAnimation1 {
+
+  from {
+     right: 90%; 
+  }
+  
+  to {
+    right: 50%; 
+  }
+}
+
+@keyframes pupuAnimation2 {
+
+  from {
+     left: 90%; 
+  }
+  
+  to {
+    left: 50%; 
+  }
+}
+
+/*****************************************************************************************************/
+/* Lisaa pollo button.                                                                               *         
+/*****************************************************************************************************/
+
+.lisaaButton {
+  position: absolute;
+  width: 100px;
+  left:calc(100% - 100px);
+}
+
+/*****************************************************************************************************/
+/* Scrollaava teksti taso3                                                                           *         
+/*****************************************************************************************************/
+
+.text3taso {
+  width: 100%;
+  height: 33%;
+  position: absolute;
+  top: 60%;
+}
+
+/*****************************************************************************************************/
+/* Scrollaava teksti taso5                                                                           *         
+/*****************************************************************************************************/
+
+.text5taso {
+  width: 100%;
+  height: 33%;
+  position: absolute;
+  background-color: transparent;
+  top: 0;
+}
+
+/*****************************************************************************************************/
+/* lumisade                                                                                          *         
+/*****************************************************************************************************/
+
+.lumihiutaleImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lumihiutale {
+  width: 2%;
+  height: 5%;
+  margin:0;
+  padding:0;
+  display: inline-block;
+  position: absolute;
+/*  animation: 5s normal hiutaleAnimation linear;*/ 
+}
+
+/* Idioottimainen tapa tehda tama. Omatuntoa soimaa pahasti... */
+@keyframes hiutaleAnimation {from {top: 5%;} to {top: 95%; }}
+
+/*
+.lumisadeCanvas {
+  background-color: transparent;
+}
+*/

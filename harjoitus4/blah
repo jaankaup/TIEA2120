@@ -1,0 +1,271 @@
+"use strict";
+
+// Varastoidaan joitain kuva tanne. Esim. pupu.
+var globalImages = [];
+
+var pupuVasenImages = [];
+var pupuOikeaImages = [];
+
+// Pollon syntymapaikka-enum.
+const PolloRespawnType = { vasen:0, oikea:1, original:2};
+
+// Pidetaan ylla seuraavaa pollon syntymapaikkaa.
+var nextPolloRespawn = PolloRespawnType.original; 
+var nextZ = 0;
+
+// Demotaso enum.
+const DemoTaso = { taso1: 1, taso3: 2, taso5: 3};
+
+// Aseta tahan haluamasi taso.  
+var globalDemoTaso = DemoTaso.taso3;
+
+window.onload = e => {
+
+  // 1-tasossa ollaan jo toteutettu 3-tason pollon lisays je lentorata kohdat. Tama idea tuli nyt vahan liian myohaan, joten en lahde 
+  // huonontamaan koodia.
+  if (globalDemoTaso === DemoTaso.taso1) {
+    luoPalkit(10);
+    luoPupuVasen_taso1();
+    luoPupuOikea_taso1();
+    luoPollo();
+    luoButton();
+  }
+
+  // Taso 3-mukainen ratkaisu.
+  else if (globalDemoTaso === DemoTaso.taso3) {
+    luoPalkit(10);
+    luoPuput_taso3(100);
+    luoPollo();
+    luoButton();
+  }
+  // Taso 5-mukainen ratkaisu.
+  else if (globalDemoTaso === DemoTaso.taso3) {
+
+  }
+
+  //console.log(findKeyframesRule("moveEessunTaas").cssRules[0].style[0]);
+}
+
+/*******************************************************************************************************************************************************/
+
+// Funktio, joka antaa aina suuremman z-indeksi arvon kuin mita muilla on. Oletuksena on se, ettei z-arvoja luoda missaan muualla kuin tassa. 
+// Olisi voinnut ehka tehda niin, etta kaydaan kaikki elementetit lapi, ja niiden z-arvot, ja sitten luotu niiden perusteella uusi isompi z. 
+function getNextZ() {
+  nextZ = nextZ + 1;
+  return nextZ-1;
+}
+
+/*******************************************************************************************************************************************************/
+
+/* Funktio, joka luo tason-1 mukaiset palkit. @lkm on luotaivien palkkien lukumaara. Palkkeja luodaan 250msek valein. Animaatio on 
+ * maaritelty css-tiedostossa. Animation-delayn muuttaminenkin olisi varmaankin ajanut saman asian ja viela fiksumminkin. Ei olisi tarvinnut 
+ * leikkia setTimeoutin kanssa.*/
+
+function luoPalkit(lkm) {
+  for (let i=0; i<lkm; i++) {
+    var z = getNextZ();
+    setTimeout(e => luoPalkki(z), 250*i);
+  }
+}
+
+/*******************************************************************************************************************************************************/
+
+/* Luo yhden palkin ja asettaa sen body-elementin sisalle. */
+function luoPalkki(index) {
+  var kohde = document.querySelector('body');
+  var p = document.createElement('p');
+  var img = document.createElement('img');
+  p.appendChild(img);
+  img.src = "palkki.svg";
+  img.setAttribute('class','imgPalkki');
+  p.setAttribute('class','pPalkki');
+  p.style.zIndex = index;
+  kohde.appendChild(p);
+}
+
+/*******************************************************************************************************************************************************/
+
+// Funtio, joka luo pollon joka toinen kerta vasemmalta ja joka toinen kerta oikealta. En tieda ymmarsiko tehtavanannon oikein. 
+// Pollolle arvotaan joka kerta uusi animation-timing-function. Eli pollon animaatio menee vahan eri tahtia/vauhtia riippuen valitusta funktiosta.
+function luoPollo() {
+  
+  // Luodaan pollo.
+  var kohde = document.querySelector('body');
+  var p = document.createElement('p');
+  var img = document.createElement('img');
+  p.appendChild(img);
+  img.src = "owl.svg";
+
+  // animation-timing-function vaihtoehdot.
+  const vaihtoehdot = ['ease','ease-in','ease-out','ease-in-out','linear','cubic-bezier(0.1,0.7,1.0,0.1)'];
+  // Arvotaan niista yksi.
+  var arvottu = vaihtoehdot[Math.round(Math.floor(Math.random() * Math.floor(vaihtoehdot.length)))]; 
+
+  // Luodaan vuronperaan pollo vasemmalta ja vuoronperaan oikealta. 
+  switch (nextPolloRespawn) {
+    case PolloRespawnType.vasen:
+      p.setAttribute('class','pPolloVasen');
+      // Asetetaan arvottin timing-funtio.
+      p.style.animationTimingFunction = arvottu;
+      nextPolloRespawn = PolloRespawnType.oikea;
+      break;
+    case PolloRespawnType.oikea:
+      p.setAttribute('class','pPolloOikea');
+      // Asetetaan arvottin timing-funtio.
+      p.style.animationTimingFunction = arvottu;
+      nextPolloRespawn = PolloRespawnType.vasen;
+      break;
+    case PolloRespawnType.original:
+      //console.log(findKeyframesRule("pollonLiike"));
+      p.setAttribute('class','pPolloOriginal');
+      nextPolloRespawn = PolloRespawnType.vasen;
+      break;
+    default:
+      console.error(`luoPollo(): nextPolloRespawn === ${nextPolloRespawn}. Ei tuettu!`);
+  }
+  // Asetetaan pollolle z-indeksi.
+  p.style.zIndex = getNextZ();
+  kohde.appendChild(p);
+}
+
+/*******************************************************************************************************************************************************/
+
+function luoPupuVasen_taso1() {
+  var kohde = document.querySelector('body');
+  var canvas = document.createElement('canvas');
+  var img = document.createElement('img');
+  globalImages.push(img);
+  img.src = "bunny.png";
+  img.setAttribute('class','imgPupu');
+  canvas.setAttribute('class','canvasPupuVasen');
+  canvas.style.zIndex = getNextZ();
+  kohde.appendChild(canvas);
+  let ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, img.width/2.0, img.height, 0, 0, canvas.width, canvas.height);
+}
+
+/*******************************************************************************************************************************************************/
+
+function luoPupuOikea_taso1() {
+  var kohde = document.querySelector('body');
+  var canvas = document.createElement('canvas');
+  var img = globalImages.find(x => x.className === 'imgPupu');
+  canvas.setAttribute('class','canvasPupuOikea');
+  canvas.style.zIndex = getNextZ();
+  kohde.appendChild(canvas);
+  let ctx = canvas.getContext('2d');
+  ctx.drawImage(img, img.width/2.0, 0, img.width/2.0, img.height, 0, 0, canvas.width, canvas.height);
+}
+
+/*******************************************************************************************************************************************************/
+
+// Luodaan puput, ja laitetaan animaatio kayntiin. Hieman copypastea tassa, mutta melkoon. En jaksa alkaa hienostelemaan tassa.
+function luoPuput_taso3(palkkiJakoLkm) {
+  var kohde = document.querySelector('body');
+  var canvasV = document.createElement('canvas');
+  var canvasO = document.createElement('canvas');
+  var img = document.createElement('img');
+  globalImages.push(img);
+  img.src = "bunny.png";
+  img.setAttribute('class','imgPupu');
+  var imgHeight = img.height;
+  var imgWidth = img.width;
+  canvasV.setAttribute('class','canvasPupuVasen');
+  canvasV.style.zIndex = getNextZ();
+  canvasO.setAttribute('class','canvasPupuOikea');
+  canvasO.style.zIndex = getNextZ();
+  kohde.appendChild(canvasV);
+  kohde.appendChild(canvasO);
+
+  var piirtolkm = 0;
+  // Animaatiolaskuri. Toivottavasti 64-bittia riittaa, ennen kuin ohjelma loppuu. Silloin tulee z-day.
+  var lkm = 0;
+
+  var piirtoFunctioPupuV = () => {
+    var ctx = canvasV.getContext('2d');
+    var ctx2 = canvasO.getContext('2d');
+    var palkinKorkeus = img.height/palkkiJakoLkm;
+
+    // Tehdaan nyt animaatio piirtamalla pupu siivuittain ja venyttelemalla siivuja pystysuorassa.
+    var time = new Date();
+    
+    // Hahaa. Haskelia javascriptilla. Huonoa Haskelia siis :(.
+    // Trigonomertrista magiaa. En viitsi selittaa tata liikaa, muuten joku viela patentoi taman.
+    var sy = [...Array(palkkiJakoLkm).keys()].map(x => img.height/palkkiJakoLkm*x); 
+    var venytettysy = [...Array(palkkiJakoLkm).keys()].map(x=>x+lkm);
+    venytettysy = venytettysy.map(x => palkinKorkeus/2.0 + (palkinKorkeus/4.0)*Math.sin(0.4*x/6.0)); 
+    lkm = lkm + 1;
+    var sum = venytettysy.reduce((x,y) => x + y);
+    venytettysy = venytettysy.map(x => Math.floor(x));
+    piirtolkm = piirtolkm+1;
+
+    var oWidth = img.width/2.0;
+    var nextSourceY = 0;
+    var nextTargetY = 0;
+    var computedCanvasWidth = canvasV.offsetWidth;
+    var style = window.getComputedStyle(canvasV,null);
+    var leveys = img.naturalWidth; 
+    var leveys2 = img.width; 
+    if (piirtolkm < 2) console.log(leveys);
+    if (piirtolkm < 2) console.log(leveys2);
+
+    // Puhdistetaan canvas.
+    ctx.clearRect(0,0,canvasV.offsetWidth, canvasV.offsetHeight);
+    ctx2.clearRect(0,0,canvasO.offsetWidth, canvasO.offsetHeight);
+
+    // Piirretaan palkit silmukassa.
+    for (let x=0; x<sy.length; x++) {
+      ctx.drawImage(img, 0, sy[x], oWidth, palkinKorkeus, // Alkuperaisen kuvan koordinaatit, suorakaiseen muotoinen palkki, jolla on palkin korkeus.
+                         0, nextTargetY, computedCanvasWidth , venytettysy[x]); // Canvaksen kooridaatit, johon piiretaan. Piirretaan skaalatut palkit niin, etta koko
+      			                                                // kanvas tayttyy.
+//      if (piirtolkm < 2) console.log(computedCanvasWidth);
+//      if (piirtolkm < 2) console.log(img.width);
+      ctx2.drawImage(img, oWidth, sy[x], img.width, palkinKorkeus, 
+                         0, nextTargetY, computedCanvasWidth , venytettysy[x]);
+
+      nextTargetY = nextTargetY + venytettysy[x];
+    }
+    // Halutaan etta tata piirretaan jatkossakin.
+    requestAnimationFrame(piirtoFunctioPupuV);
+  };
+  requestAnimationFrame(piirtoFunctioPupuV);
+}
+
+/*******************************************************************************************************************************************************/
+
+function luoButton() {
+  var kohde = document.querySelector('body');
+  var button = document.createElement('button');
+  button.setAttribute('class','lisaaButton');
+  button.style.zIndex = getNextZ();
+  button.textContent= "Lisää pöllö";
+  kohde.appendChild(button);
+
+  // Lisaa pollo toiminto.
+  button.addEventListener('click', e => {
+    e.preventDefault();
+    luoPollo();
+    // Kasvatetaan nappulan z-indeksi suurimmaksi kuin edelliset, niin pysyy kaikkien elementtien ylapuolella.
+    document.querySelector('.lisaaButton').style.zIndex = getNextZ();
+  });
+}
+
+/*******************************************************************************************************************************************************/
+
+function drawPupu() {
+  var pupuVasen = document.querySelector('.pupuVasen');    
+}
+
+/*******************************************************************************************************************************************************/
+
+// TIEA2120 sivulta loytyva apufunktio.
+function findKeyframesRule(rule) {
+  var ss = document.styleSheets;
+  for (var i = 0; i < ss.length; ++i) {
+    for (var j = 0; j < ss[i].cssRules.length; ++j) {
+      if (ss[i].cssRules[j].type == window.CSSRule.KEYFRAMES_RULE && ss[i].cssRules[j].name == rule) { 
+        return ss[i].cssRules[j]; }
+      }
+    }
+  return null;
+}
